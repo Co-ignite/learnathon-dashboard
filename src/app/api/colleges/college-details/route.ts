@@ -1,0 +1,77 @@
+import { NextRequest, NextResponse } from "next/server";
+import { db, auth } from "@/lib/firebase";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+
+export async function POST(req: NextRequest) {
+  try {
+    console.log("handler called");
+    const body = await req.json();
+    console.log(body);
+    const { collegeName, repName, repEmail, repContact, role } = body;
+
+    if (!collegeName) {
+      console.error("College name is required");
+      console.error(req.body);
+      return NextResponse.json({
+        success: false,
+        message: "College name is required",
+      });
+    }
+
+    // Check if the college is already registered
+    const collectionRef = collection(db, "registrations");
+    const q = query(collectionRef, where("collegeName", "==", collegeName));
+    const collegesSnapshot = await getDocs(q);
+
+    if (collegesSnapshot.docs.length) {
+      return NextResponse.json({
+        success: false,
+        message: `College is already registered: ${repEmail}`,
+      });
+    }
+
+    // Create a new document in the 'registrations' collection
+    const docRef = await addDoc(collection(db, "registrations"), {
+      collegeName,
+      repName,
+      repEmail,
+      repContact,
+      role,
+      uploadLater: true,
+      paymentStatus: "pending",
+      createdAt: Date.now(),
+    });
+
+    console.log(docRef.id);
+
+    // Create user with email and password in Firebase Auth and add the user ID to the college document in Firestore, also send email to the user with the password
+    await createUserWithEmailAndPassword(auth, repEmail, "password");
+
+    await addDoc(collection(db, "users"), {
+      email: repEmail,
+      role: role,
+      contact: repContact,
+      name: repName,
+    });
+
+    // Send email to the user with the password
+    await sendPasswordResetEmail(auth, repEmail);
+
+    return NextResponse.json({
+      success: true,
+      message: "College details updated successfully",
+      id: docRef.id,
+    });
+  } catch (error) {
+    console.error("Error updating college details:", error);
+    const requestBody = await req.json();
+    return NextResponse.json({
+      success: false,
+      message: `Internal Server Error. Failed to update details for ${requestBody["collegeName"]}`,
+    });
+  }
+}

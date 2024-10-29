@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState } from "react";
 import { useRouter } from 'next/navigation'
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -8,7 +8,13 @@ import { auth } from '@/lib/firebase';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 
@@ -24,18 +30,23 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/dashboard'); // Redirect to dashboard after successful login
+      router.push("/dashboard"); // Redirect to dashboard after successful login
     } catch (error) {
-      setError('Failed to log in. Please check your email and password.');
+      console.error("Failed to log in" + error);
+      setError("Failed to log in. Please check your email and password.");
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen bg-black">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        Loading...
+      </div>
+    );
   }
 
   if (user) {
-    router.push('/dashboard'); // Redirect to dashboard if user is already logged in
+    router.push("/"); // Redirect to dashboard if user is already logged in
   }
 
   return (

@@ -1,6 +1,7 @@
 import { CollegeRegistration } from "./registration";
 
 export interface ModuleConfirmation {
+  id?: string;
   representative: string;
   status: string;
   no_of_batches_students: { course: string; count: string }[];

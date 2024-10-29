@@ -25,6 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <script src="https://sdk.cashfree.com/js/v3/cashfree.js" async />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
