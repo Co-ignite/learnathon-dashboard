@@ -36,7 +36,6 @@ export async function POST(req: NextRequest) {
             csv({
               skipLines: 0,
               headers: true,
-              trim: true,
             })
           )
           .on("headers", (headers) => {
@@ -55,7 +54,7 @@ export async function POST(req: NextRequest) {
 
       if (jsonData.length > 0) {
         columns = jsonData[0] as string[];
-        participants = jsonData.slice(1).map((row) => {
+        participants = jsonData.slice(1).map((row: any) => {
           const participant: Record<string, any> = {};
           columns.forEach((col, index) => {
             participant[col] = row[index];

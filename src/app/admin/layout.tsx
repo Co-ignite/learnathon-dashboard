@@ -18,11 +18,19 @@ import { auth } from "@/lib/firebase";
 import { motion } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 
+interface User {
+  name: string;
+  role: string;
+  mail: string;
+  contact: string;
+}
+
 export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [user, setUser] = useState<User>();
   const [path, setPath] = useState("/admin");
   const [openUserData, setOpenUserData] = useState(false);
   const [userData, setUserData] = useState("");
@@ -56,25 +64,23 @@ export default function AdminLayout({
   ]);
 
   useEffect(() => {
+    const parseUserData = () => {
+      try {
+        return JSON.parse(userData);
+      } catch (e) {
+        console.error("Error parsing user data", e);
+        return null;
+      }
+    };
     const storedUserData = sessionStorage.getItem("userData");
     if (storedUserData) {
       setUserData(storedUserData);
+      setUser(parseUserData());
     }
 
     console.log("path", window.location.pathname);
     setPath(window.location.pathname);
-  }, []);
-
-  const parseUserData = () => {
-    try {
-      return JSON.parse(userData);
-    } catch (e) {
-      console.error("Error parsing user data", e);
-      return null;
-    }
-  };
-
-  const user = parseUserData();
+  }, [userData]);
 
   const UserDataPopup = () => {
     return (
