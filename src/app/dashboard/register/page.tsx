@@ -1,7 +1,7 @@
-import DashboardRegistration from "../../../components/dashboard/DashboardRegistration";
-
 export default function Register() {
-    return (
-        <DashboardRegistration />
-    );
+  return (
+    <div>
+      <h1>Register</h1>
+    </div>
+  );
 }
