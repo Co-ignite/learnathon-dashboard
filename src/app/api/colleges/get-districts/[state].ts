@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { getDocs, collection, query, where } from "firebase/firestore";
+import { NextApiRequest } from "next";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextApiRequest) {
   try {
-    const params = req.nextUrl.searchParams;
-    console.log(params);
-    const state = params.get("state");
+    const { state } = req.query;
 
     // get all districts from the state
     const collectionRef = collection(db, "states");

@@ -1,13 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { NextApiRequest } from "next";
 import { db } from "@/lib/firebase";
 import { getDoc, doc } from "firebase/firestore";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextApiRequest) {
   try {
-    console.log("handler called");
-    const params = req.nextUrl.searchParams;
-    console.log(params);
-    const uid = params.get("uid");
+    const { uid } = req.query;
 
     // get user data from firestore db
     const userRef = doc(db, "users", uid as string);

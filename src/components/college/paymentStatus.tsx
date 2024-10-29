@@ -11,9 +11,7 @@ export default function PaymentStatus() {
   useEffect(() => {
     const verifyPayment = async () => {
       try {
-        const response = await fetch(
-          `/api/colleges/payment/verify?order_id=${orderId}`
-        );
+        const response = await fetch(`/api/colleges/payment/verify/${orderId}`);
         const data = await response.json();
         setStatus(data.order_status);
       } catch (error) {

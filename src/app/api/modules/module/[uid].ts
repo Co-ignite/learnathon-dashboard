@@ -1,13 +1,12 @@
 import { db } from "@/lib/firebase";
 import { getDoc, doc } from "firebase/firestore";
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { NextApiRequest } from "next";
 import { ModuleConfirmation } from "@/app/models/moduleConfirmation";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextApiRequest) {
   try {
-    const params = req.nextUrl.searchParams;
-    console.log(params);
-    const uid = params.get("uid");
+    const { uid } = req.query;
     const module = await getDoc(doc(db, "modules", uid as string));
 
     const collegeModules: ModuleConfirmation =
