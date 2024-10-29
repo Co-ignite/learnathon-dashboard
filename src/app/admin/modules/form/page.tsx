@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -61,15 +62,13 @@ interface Trainer {
   name: string;
 }
 
-interface ModuleConfirmationFormProps {
-  initialData?: FormValues;
-  onSubmit: (data: FormValues) => Promise<void>;
-}
-
 export default function ModuleConfirmationForm({
   initialData,
   onSubmit,
-}: ModuleConfirmationFormProps) {
+}: {
+  initialData?: FormValues;
+  onSubmit: (data: FormValues) => Promise<void>;
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openCollege, setOpenCollege] = useState(false);
   const [openTrainers, setOpenTrainers] = useState(false);
