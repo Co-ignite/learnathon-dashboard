@@ -111,7 +111,7 @@ export default function FileUploadForm(props: {
 
         // API call to update Firestore
         const uploadResponse = await fetch(
-          "process.env.BACKEND_URL/api/colleges/upload-participants",
+          "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/upload-participants",
           {
             method: "POST",
             body: formData,

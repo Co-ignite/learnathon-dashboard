@@ -108,7 +108,7 @@ export default function CollegeDetailsForm(props: {
       setLoading(true);
       try {
         const response = await fetch(
-          `process.env.BACKEND_URL/api/colleges/get-districts?state=${state}`
+          `process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/get-districts/${state}`
         );
 
         if (!response.ok) throw new Error("Failed to fetch districts");
@@ -138,7 +138,7 @@ export default function CollegeDetailsForm(props: {
       setLoading(true);
       try {
         const response = await fetch(
-          `process.env.BACKEND_URL/api/colleges/get-colleges?district=${district}`
+          `process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/get-colleges/${district}`
         );
         if (!response.ok) throw new Error("Failed to fetch colleges");
 
@@ -168,7 +168,7 @@ export default function CollegeDetailsForm(props: {
       if (!data) throw new Error("Failed to update college details");
       console.log("data is " + JSON.stringify(data));
       const response: Response = await fetch(
-        "process.env.BACKEND_URL/api/colleges/college-details",
+        "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/college-details",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -23,7 +23,7 @@ export default function CollegeRegistrationDetails() {
     const fetchRegistrations = async () => {
       try {
         const response = await axios.get(
-          "process.env.BACKEND_URL/api/colleges"
+          "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges"
         );
         if (response.data.success) {
           setRegistrations(response.data.registrations);

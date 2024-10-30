@@ -47,7 +47,7 @@ export default function PaymentForm({
       setLoading(true);
 
       const response = await fetch(
-        "process.env.BACKEND_URL/api/colleges/payment/create",
+        "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/payment/create",
         {
           method: "POST",
           headers: {

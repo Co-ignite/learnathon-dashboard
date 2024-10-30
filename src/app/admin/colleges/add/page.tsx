@@ -23,7 +23,7 @@ export default function AddCollege() {
     return (
       <div className="h-full m-auto">
         <RegistrationProcess
-          returnURL="process.env.BACKEND_URL/admin/colleges/status"
+          returnURL="process.env.NEXT_PUBLIC_BACKEND_URL/admin/colleges/status"
           collegeId={id}
         />
       </div>

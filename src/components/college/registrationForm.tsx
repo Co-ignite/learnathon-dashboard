@@ -42,13 +42,16 @@ export default function RegistrationProcess(props: {
   useEffect(() => {
     setLoading(true);
     if (props.collegeId !== "") {
-      fetch("process.env.BACKEND_URL/api/colleges/registration-status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: props.collegeId }),
-      })
+      fetch(
+        "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/registration-status",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: props.collegeId }),
+        }
+      )
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {

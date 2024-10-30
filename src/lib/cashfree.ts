@@ -6,8 +6,8 @@ export class Cashfree {
   private baseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.CASHFREE_API_KEY!;
-    this.secretKey = process.env.CASHFREE_SECRET_KEY!;
+    this.apiKey = process.env.NEXT_PUBLIC_CASHFREE_API_KEY!;
+    this.secretKey = process.env.NEXT_PUBLIC_CASHFREE_SECRET_KEY!;
     this.baseUrl =
       process.env.NODE_ENV === "production"
         ? "https://api.cashfree.com/pg"
@@ -37,7 +37,7 @@ export class Cashfree {
       },
       order_meta: {
         return_url: params.returnURL + `?order_id=${orderId}`,
-        notify_url: `process.env.BACKEND_URL/api/colleges/payment/webhook`,
+        notify_url: `process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/payment/webhook`,
       },
     };
 

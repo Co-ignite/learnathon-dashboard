@@ -24,7 +24,9 @@ export default function Modules() {
   useEffect(() => {
     const getModules = async () => {
       try {
-        const response = await axios.get("process.env.BACKEND_URL/api/modules");
+        const response = await axios.get(
+          "process.env.NEXT_PUBLIC_BACKEND_URL/api/modules"
+        );
         if (response.data.success) {
           setModules(response.data.modules);
         }
