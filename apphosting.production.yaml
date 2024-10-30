@@ -12,7 +12,7 @@ env:
       - BUILD
       - RUNTIME
   - variable: NODE_ENV
-    value: staging
+    value: production
     availability:
       - BUILD
       - RUNTIME
