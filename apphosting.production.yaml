@@ -17,7 +17,7 @@ env:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_BACKEND_URL
-    value: https://dashboard-staging.learnathon.live
+    value: https://dashboard.learnathon.live
     availability:
       - BUILD
       - RUNTIME
