@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
   try {
     console.log("handler called");
     const body = await req.json();
-    console.log(body);
     const { collegeName, repName, repEmail, repContact, role } = body;
 
     if (!collegeName) {
@@ -31,6 +30,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: false,
         message: `College is already registered: ${repEmail}`,
+      });
+    }
+
+    // Check if the user is already registered
+    const userCollectionRef = collection(db, "users");
+    const userQuery = query(userCollectionRef, where("email", "==", repEmail));
+    const userSnapshot = await getDocs(userQuery);
+
+    if (userSnapshot.docs.length) {
+      return NextResponse.json({
+        success: false,
+        message: `User is already registered: ${repEmail}`,
       });
     }
 

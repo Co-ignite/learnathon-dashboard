@@ -108,7 +108,7 @@ export default function CollegeDetailsForm(props: {
       setLoading(true);
       try {
         const response = await fetch(
-          `process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/get-districts/${state}`
+          `/api/colleges/get-districts?state=${state}`
         );
 
         if (!response.ok) throw new Error("Failed to fetch districts");
@@ -138,7 +138,7 @@ export default function CollegeDetailsForm(props: {
       setLoading(true);
       try {
         const response = await fetch(
-          `process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/get-colleges/${district}`
+          `/api/colleges/get-colleges?district=${district}`
         );
         if (!response.ok) throw new Error("Failed to fetch colleges");
 
@@ -167,27 +167,33 @@ export default function CollegeDetailsForm(props: {
     try {
       if (!data) throw new Error("Failed to update college details");
       console.log("data is " + JSON.stringify(data));
-      const response: Response = await fetch(
-        "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/college-details",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }
-      );
+      const response: Response = await fetch("/api/colleges/college-details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
       const responseData = await response.json();
 
       console.log("response data is " + JSON.stringify(responseData));
-      if (!response.ok || !responseData.success)
+      if (!response.ok || !responseData.success) {
+        toast({
+          title: "Error",
+          description:
+            responseData.message ||
+            "Failed to update college details. Please try again.",
+          variant: "destructive",
+        });
         throw new Error("Failed to update college details");
+      }
+
+      props.onComplete({
+        id: responseData.id,
+      });
 
       toast({
         title: "College details saved",
         description: "Your college details have been successfully saved.",
-      });
-      props.onComplete({
-        id: responseData.id,
       });
     } catch (error) {
       console.error("Error updating college details:", error);

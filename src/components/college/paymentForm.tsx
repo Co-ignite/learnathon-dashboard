@@ -46,25 +46,22 @@ export default function PaymentForm({
     try {
       setLoading(true);
 
-      const response = await fetch(
-        "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/payment/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      const response = await fetch("/api/colleges/payment/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          returnURL,
+          amount: formData.Amount,
+          customerDetails: {
+            id: formData.collegeId,
+            email: formData.Email,
+            phone: formData.Contact,
+            name: formData.Name,
           },
-          body: JSON.stringify({
-            returnURL,
-            amount: formData.Amount,
-            customerDetails: {
-              id: formData.collegeId,
-              email: formData.Email,
-              phone: formData.Contact,
-              name: formData.Name,
-            },
-          }),
-        }
-      );
+        }),
+      });
 
       if (response.status == 200) {
         let data = await response.json();

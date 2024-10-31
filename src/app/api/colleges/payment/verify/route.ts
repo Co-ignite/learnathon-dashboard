@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { cashfree } from "@/lib/cashfree";
 import { db } from "@/lib/firebase";

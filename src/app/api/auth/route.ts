@@ -1,14 +1,22 @@
-import { NextResponse } from "next/server";
-import { NextApiRequest } from "next";
+export const dynamic = "force-dynamic";
+
+import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/firebase";
 import { getDoc, doc } from "firebase/firestore";
 
-export async function GET(req: NextApiRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { uid } = req.query;
+    const uid = request.nextUrl.searchParams.get("uid");
+
+    if (!uid) {
+      return NextResponse.json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
 
     // get user data from firestore db
-    const userRef = doc(db, "users", uid as string);
+    const userRef = doc(db, "users", uid);
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {

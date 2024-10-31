@@ -10,7 +10,10 @@ import PaymentForm from "@/components/college/paymentForm";
 import { RegistrationSteps } from "@/components/college/registrationSteps";
 import RegistrationCompleted from "./registrationCompleted";
 
-export default function RegistrationProcess(props: {
+export default function RegistrationProcess({
+  collegeId = "",
+  returnURL = "",
+}: {
   collegeId: string;
   returnURL: string;
 }) {
@@ -33,7 +36,9 @@ export default function RegistrationProcess(props: {
     if (step === 1 && data.id) {
       params.set("id", data.id);
       const newUrl = `${window.location.pathname}?${params.toString()}`;
+      console.log("newUrl", newUrl);
       router.push(newUrl);
+      window.location.href = newUrl;
     } else if (step === 2) {
       setStep(3);
     }
@@ -41,17 +46,14 @@ export default function RegistrationProcess(props: {
 
   useEffect(() => {
     setLoading(true);
-    if (props.collegeId !== "") {
-      fetch(
-        "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/registration-status",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: props.collegeId }),
-        }
-      )
+    if (collegeId !== "") {
+      fetch("/api/colleges/registration-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: collegeId }),
+      })
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
@@ -84,7 +86,7 @@ export default function RegistrationProcess(props: {
       setStep(1);
     }
     setLoading(false);
-  }, [props, step]);
+  }, [collegeId, step]);
 
   if (loading) {
     return (
@@ -108,12 +110,12 @@ export default function RegistrationProcess(props: {
               {step === 2 && (
                 <FileUploadForm
                   onComplete={handleStepComplete}
-                  collegeId={props.collegeId}
+                  collegeId={collegeId}
                 />
               )}
               {step === 3 && (
                 <PaymentForm
-                  returnURL={props.returnURL}
+                  returnURL={returnURL}
                   formData={formData}
                   participantCount={participantCount}
                 />

@@ -1,12 +1,16 @@
+export const dynamic = "force-dynamic";
+
 import { db } from "@/lib/firebase";
 import { getDoc, doc } from "firebase/firestore";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { NextApiRequest } from "next";
 import { ModuleConfirmation } from "@/app/models/moduleConfirmation";
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const { uid } = req.query;
+    const params = req.nextUrl.searchParams;
+    const uid = params.get("uid");
+
     const module = await getDoc(doc(db, "modules", uid as string));
 
     const collegeModules: ModuleConfirmation =

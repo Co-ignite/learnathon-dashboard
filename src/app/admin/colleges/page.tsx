@@ -22,9 +22,7 @@ export default function CollegeRegistrationDetails() {
   useEffect(() => {
     const fetchRegistrations = async () => {
       try {
-        const response = await axios.get(
-          "process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges"
-        );
+        const response = await axios.get("/api/colleges");
         if (response.data.success) {
           setRegistrations(response.data.registrations);
         }

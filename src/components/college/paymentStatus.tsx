@@ -11,9 +11,16 @@ export default function PaymentStatus() {
   useEffect(() => {
     const verifyPayment = async () => {
       try {
-        const response = await fetch(`/api/colleges/payment/verify/${orderId}`);
+        const response = await fetch(
+          `/api/colleges/payment/verify?order_id=${orderId}`
+        );
         const data = await response.json();
         setStatus(data.order_status);
+        if (data.order_status === "PAID") {
+          setTimeout(() => {
+            window.location.href = "/admin/colleges";
+          }, 5000);
+        }
       } catch (error) {
         console.error("Error verifying payment:", error);
         setStatus("error");

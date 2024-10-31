@@ -1,11 +1,13 @@
-import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
+
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { getDocs, collection, query, where } from "firebase/firestore";
-import { NextApiRequest } from "next";
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const { state } = req.query;
+    const params = req.nextUrl.searchParams;
+    const state = params.get("state");
 
     // get all districts from the state
     const collectionRef = collection(db, "states");

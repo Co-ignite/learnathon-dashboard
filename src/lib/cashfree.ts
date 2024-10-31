@@ -37,16 +37,18 @@ export class Cashfree {
       },
       order_meta: {
         return_url: params.returnURL + `?order_id=${orderId}`,
-        notify_url: `process.env.NEXT_PUBLIC_BACKEND_URL/api/colleges/payment/webhook`,
+        notify_url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/colleges/payment/webhook`,
       },
     };
 
+    console.log("Creating order:", orderData);
     try {
       const response = await fetch(`${this.baseUrl}/orders`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "x-api-version": "2022-09-01",
+          accept: "application/json",
+          "content-type": "application/json",
+          "x-api-version": "2023-08-01",
           "x-client-id": this.apiKey,
           "x-client-secret": this.secretKey,
         },
@@ -54,7 +56,10 @@ export class Cashfree {
       });
 
       if (!response.ok) {
-        throw new Error(`Error creating order: ${response.statusText}`);
+        console.error("Failed to create order:", response.statusText);
+        const body = await response.text();
+        console.error(body);
+        return null;
       }
 
       return response.json();

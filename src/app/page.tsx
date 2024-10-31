@@ -15,7 +15,7 @@ export default function Home() {
       if (user) {
         console.log(user);
         try {
-          const response = await axiosInstance.get(`/api/auth/${user.uid}`);
+          const response = await axiosInstance.get(`/api/auth?uid=${user.uid}`);
           if (response.status === 200) {
             const userData = response.data.data;
             sessionStorage.setItem("userData", JSON.stringify(userData));

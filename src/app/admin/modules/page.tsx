@@ -25,7 +25,7 @@ export default function Modules() {
     const getModules = async () => {
       try {
         const response = await axios.get(
-          "process.env.NEXT_PUBLIC_BACKEND_URL/api/modules"
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/modules`
         );
         if (response.data.success) {
           setModules(response.data.modules);
