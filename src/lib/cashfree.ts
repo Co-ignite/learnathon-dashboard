@@ -56,6 +56,8 @@ export class Cashfree {
         console.error("Failed to create order:", response.statusText);
         const body = await response.text();
         console.error(body);
+        console.error(response.status);
+        console.error(response.type);
         return null;
       }
 
