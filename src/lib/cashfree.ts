@@ -8,10 +8,7 @@ export class Cashfree {
   constructor() {
     this.apiKey = process.env.NEXT_PUBLIC_CASHFREE_API_KEY!;
     this.secretKey = process.env.NEXT_PUBLIC_CASHFREE_SECRET_KEY!;
-    this.baseUrl =
-      process.env.NODE_ENV === "production"
-        ? "https://api.cashfree.com/pg"
-        : "https://sandbox.cashfree.com/pg";
+    this.baseUrl = "https://sandbox.cashfree.com/pg";
   }
 
   async createOrder(params: {
