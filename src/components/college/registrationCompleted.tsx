@@ -41,7 +41,7 @@ export default function RegistrationCompleted({
           <span className="text-sm">{collegeName}</span>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-2">
+      {/* <CardFooter className="flex flex-col space-y-2">
         <Button className="w-full" onClick={() => router.push(dashboardURL)}>
           Go to Dashboard
         </Button>
@@ -52,7 +52,7 @@ export default function RegistrationCompleted({
         >
           Register More Participants
         </Button>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   );
 }

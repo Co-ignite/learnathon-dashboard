@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import Sidebar from "@/components/admin/sidebar"
+import Sidebar from "@/components/admin/sidebar";
 import { useState, useEffect, useDebugValue } from "react";
 import {
   UserCircleIcon,
@@ -10,9 +10,9 @@ import {
   BookAudioIcon,
   Building2Icon,
   GraduationCap,
-  User,
   PanelLeftCloseIcon,
   PanelRightCloseIcon,
+  Icon,
 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { motion } from "framer-motion";
@@ -39,29 +39,16 @@ export default function AdminLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [tiles, setTiles] = useState([
     {
-      name: "Home",
+      name: "Register",
       icon: <Home size={20} />,
-      path: "/admin",
-    },
-    {
-      name: "Modules",
-      icon: <BookAudioIcon size={20} />,
-      path: "/admin/modules",
-    },
-    {
-      name: "Colleges",
-      icon: <Building2Icon size={20} />,
-      path: "/admin/colleges",
-    },
-    {
-      name: "Users",
-      icon: <User size={20} />,
-      path: "/admin/users",
-    },
-    {
-      name: "Participants",
-      icon: <GraduationCap size={20} />,
-      path: "/admin/participants",
+      path: "/dashboard/register",
+      subTiles: [
+        {
+          name: "College Details",
+          icon: <GraduationCap size={20} />,
+          path: "/dashboard/register/college-details",
+        },
+      ],
     },
   ]);
 
@@ -87,9 +74,11 @@ export default function AdminLayout({
   useEffect(() => {
     if (user) {
       console.log("user", user);
-      if (user.role === "admin") {
-        console.log("admin");
+      if (user.role !== "college") {
+        console.log("college");
         router.push("/");
+      } else {
+        router.push("/dashboard/register/");
       }
     }
   }, [user, router]);
@@ -172,7 +161,7 @@ export default function AdminLayout({
                 initial={{ width: "85%" }}
                 animate={{ width: isSidebarOpen ? "85%" : "96%" }}
                 transition={{ duration: 0.5 }}
-                className=" h-full overflow-y-auto overflow-x-hidden relative"
+                className="overflow-y-auto overflow-x-hidden relative"
               >
                 {children}
                 <Toaster />

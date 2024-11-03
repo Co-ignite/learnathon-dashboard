@@ -3,12 +3,17 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function PaymentStatus() {
+export default function PaymentStatus({
+  returnURL = "",
+  orderId = "",
+}: {
+  returnURL: string;
+  orderId: string;
+}) {
   const [status, setStatus] = useState<string>("");
-  const searchParams = useSearchParams();
-  const orderId = searchParams.get("order_id");
 
   useEffect(() => {
+    console.log("orderId", orderId);
     const verifyPayment = async () => {
       try {
         const response = await fetch(
@@ -18,7 +23,7 @@ export default function PaymentStatus() {
         setStatus(data.order_status);
         if (data.order_status === "PAID") {
           setTimeout(() => {
-            window.location.href = "/admin/colleges";
+            window.location.href = returnURL;
           }, 5000);
         }
       } catch (error) {
@@ -30,7 +35,7 @@ export default function PaymentStatus() {
     if (orderId) {
       verifyPayment();
     }
-  }, [orderId]);
+  }, [returnURL, orderId]);
 
   return (
     <div className="max-w-md mx-auto p-6 mt-10 bg-white rounded-lg shadow-md">

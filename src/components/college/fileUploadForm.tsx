@@ -47,6 +47,7 @@ export default function FileUploadForm(props: {
   onComplete: (data: any) => void;
   collegeId: string;
 }) {
+  const [uploadStatus, setUploadStatus] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [participantCount, setParticipantCount] = useState<number | null>(null);
   const form = useForm<FormValues>({

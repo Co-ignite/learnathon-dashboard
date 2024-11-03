@@ -16,9 +16,11 @@ export default function Home() {
         console.log(user);
         try {
           const response = await axiosInstance.get(`/api/auth?uid=${user.uid}`);
+          console.log(response);
           if (response.status === 200) {
             const userData = response.data.data;
             sessionStorage.setItem("userData", JSON.stringify(userData));
+            console.log(userData);
             if (userData.role === "Admin") {
               router.push("/admin");
             } else {
@@ -27,6 +29,8 @@ export default function Home() {
           }
         } catch (error) {
           console.log(error);
+          auth.signOut();
+          router.push("/login");
         }
       } else {
         router.push("/login");

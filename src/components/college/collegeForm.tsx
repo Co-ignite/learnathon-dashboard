@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
+import { CardFooter } from "../ui/card";
 
 const formSchema = z.object({
   state: z.string().min(1, "Please select a state"),
@@ -180,7 +181,7 @@ export default function CollegeDetailsForm(props: {
         toast({
           title: "Error",
           description:
-            responseData.message ||
+            responseData.data.message ||
             "Failed to update college details. Please try again.",
           variant: "destructive",
         });
@@ -371,6 +372,14 @@ export default function CollegeDetailsForm(props: {
           </Button>
         </form>
       </Form>
+      <CardFooter className="flex justify-center mt-8">
+        <p className="text-sm text-gray-600">
+          Already registered?{" "}
+          <a href="/signup" className="text-blue-600 hover:underline">
+            login
+          </a>
+        </p>
+      </CardFooter>
     </>
   );
 }

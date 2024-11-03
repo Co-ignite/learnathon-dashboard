@@ -28,16 +28,22 @@ export async function GET(request: NextRequest) {
 
     const userData = userDoc.data();
 
-    return NextResponse.json({
-      success: true,
-      data: userData,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: userData,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     // error fetching user
     console.error("Error fetching user:", error);
-    return NextResponse.json({
-      success: false,
-      message: "Error fetching user",
-    });
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Error fetching user",
+      },
+      { status: 500 }
+    );
   }
 }

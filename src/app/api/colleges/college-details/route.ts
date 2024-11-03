@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, auth } from "@/lib/firebase";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -59,18 +67,33 @@ export async function POST(req: NextRequest) {
 
     console.log(docRef.id);
 
+    try {
+      const user = await createUserWithEmailAndPassword(
+        auth,
+        repEmail,
+        Math.random().toString(36).slice(-8)
+      );
+
+      const userDocRef = doc(db, "users", user.user.uid);
+
+      await setDoc(userDocRef, {
+        email: repEmail,
+        role: "college",
+        contact: repContact,
+        name: repName,
+      });
+
+      // Send email to the user with the password
+      await sendPasswordResetEmail(auth, repEmail);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return NextResponse.json({
+        success: false,
+        message: `Your college got registered, please contact hr@learnathon.live to get your password`,
+      });
+    }
+
     // Create user with email and password in Firebase Auth and add the user ID to the college document in Firestore, also send email to the user with the password
-    await createUserWithEmailAndPassword(auth, repEmail, "password");
-
-    await addDoc(collection(db, "users"), {
-      email: repEmail,
-      role: role,
-      contact: repContact,
-      name: repName,
-    });
-
-    // Send email to the user with the password
-    await sendPasswordResetEmail(auth, repEmail);
 
     return NextResponse.json({
       success: true,

@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
 
       batchParticipants.forEach((participant) => {
         const participantDocRef = doc(
-          collection(db, "participants", collegeId, "participants")
+          collection(db, "registrations", collegeId, "participants")
         );
         batch.set(participantDocRef, participant);
       });

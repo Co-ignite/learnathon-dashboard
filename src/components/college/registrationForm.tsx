@@ -47,45 +47,49 @@ export default function RegistrationProcess({
   useEffect(() => {
     setLoading(true);
     if (collegeId !== "") {
-      fetch("/api/colleges/registration-status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: collegeId }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            if (data.step) {
-              setStep(data.step);
-              if (data.step === 3) {
-                setParticipantCount(data.participantCount);
-                setFormData({
-                  Name: data.name,
-                  Email: data.email,
-                  Contact: data.contact,
-                  Amount: (data.price || 1000) * data.participantCount,
-                  collegeId: data.collegeId,
-                });
-              }
-            } else if (data.registered) {
-              setFormData({
-                collegeName: data.collegeName,
-              });
-              setStep(4);
-            }
-          } else {
-            console.error("Error:", data.message);
-          }
+      const getCollegeStatus = async () => {
+        await fetch("/api/colleges/registration-status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: collegeId }),
         })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              if (data.step) {
+                setStep(data.step);
+                if (data.step === 3) {
+                  setParticipantCount(data.participantCount);
+                  setFormData({
+                    Name: data.name,
+                    Email: data.email,
+                    Contact: data.contact,
+                    Amount: (data.price || 1000) * data.participantCount,
+                    collegeId: data.collegeId,
+                  });
+                }
+              } else if (data.registered) {
+                setFormData({
+                  collegeName: data.collegeName,
+                });
+                setStep(4);
+              }
+            } else {
+              console.error("Error:", data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+        setLoading(false);
+      };
+      getCollegeStatus();
     } else {
       setStep(1);
+      setLoading(false);
     }
-    setLoading(false);
   }, [collegeId, step]);
 
   if (loading) {
