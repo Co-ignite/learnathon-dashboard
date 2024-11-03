@@ -1,4 +1,5 @@
-// app/api/modules/route.ts
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, getDocs, query, where, orderBy, limit, startAfter } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -21,8 +22,8 @@ export async function GET(req: NextRequest) {
     const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
     const lastDocId = url.searchParams.get('lastDocId');
 
-    let modulesQuery = collection(db, 'modules');
-    let constraints: any[] = [];
+    const modulesQuery = collection(db, 'modules');
+    const constraints: any[] = [];
 
     // Add filters if provided
     if (status) {
