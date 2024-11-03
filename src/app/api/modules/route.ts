@@ -1,45 +1,82 @@
-// use firebase and create post and get requests for module with the modules model
+// app/api/modules/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { collection, getDocs, query, where, orderBy, limit, startAfter } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import type { ModuleConfirmation } from '@/app/models/moduleConfirmation';
 
-import { db } from "@/lib/firebase";
-import { collection, getDocs, addDoc } from "firebase/firestore";
-import { NextResponse, NextRequest } from "next/server";
-import { ModuleConfirmation } from "@/app/models/moduleConfirmation";
-
-export async function GET() {
-  try {
-    const modules = await getDocs(collection(db, "modules"));
-    const collegeModules: ModuleConfirmation[] = modules.docs.map((doc) => {
-      const module = doc.data() as ModuleConfirmation;
-      module.id = doc.id;
-      return module;
-    });
-    return NextResponse.json({
-      success: true,
-      modules: collegeModules,
-    });
-  } catch (error) {
-    console.error("Error fetching modules:", error);
-    return NextResponse.json({
-      success: false,
-      message: "Error fetching modules",
-    });
-  }
+export interface ModulesResponse {
+  success: boolean;
+  modules?: ModuleConfirmation[];
+  error?: string;
+  lastDoc?: any;
+  hasMore?: boolean;
 }
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const body = await req.json();
-    const module = body as ModuleConfirmation;
-    const moduleRef = await addDoc(collection(db, "modules"), module);
+    const url = new URL(req.url);
+    const status = url.searchParams.get('status');
+    const collegeId = url.searchParams.get('collegeId');
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
+    const lastDocId = url.searchParams.get('lastDocId');
+
+    let modulesQuery = collection(db, 'modules');
+    let constraints: any[] = [];
+
+    // Add filters if provided
+    if (status) {
+      constraints.push(where('status', '==', status));
+    }
+    if (collegeId) {
+      constraints.push(where('college.id', '==', collegeId));
+    }
+
+    // Add sorting
+    constraints.push(orderBy('createdAt', 'desc'));
+    
+    // Add pagination
+    constraints.push(limit(pageSize));
+    
+    if (lastDocId) {
+      const lastDocRef = await getDocs(query(collection(db, 'modules'), where('id', '==', lastDocId)));
+      if (!lastDocRef.empty) {
+        constraints.push(startAfter(lastDocRef.docs[0]));
+      }
+    }
+
+    const q = query(modulesQuery, ...constraints);
+    const snapshot = await getDocs(q);
+
+    const modules: ModuleConfirmation[] = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      modules.push({
+        id: doc.id,
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        createdAt: new Date(data.createdAt),
+        updatedAt: new Date(data.updatedAt),
+      } as ModuleConfirmation);
+    });
+
+    // Check if there are more documents
+    const hasMore = modules.length === pageSize;
+    const lastDoc = modules[modules.length - 1]?.id;
+
     return NextResponse.json({
       success: true,
-      module: moduleRef.id,
+      modules,
+      hasMore,
+      lastDoc,
     });
+
   } catch (error) {
-    console.error("Error creating module:", error);
+    console.error('Error fetching modules:', error);
     return NextResponse.json({
       success: false,
-      message: "Error creating module",
-    });
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }, { status: 500 });
   }
 }

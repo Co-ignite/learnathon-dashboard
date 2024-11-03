@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
           const participantsCollectionRef = collection(
             db,
-            "participants",
+            "registrations",
             collegeDoc.id,
             "participants"
           );

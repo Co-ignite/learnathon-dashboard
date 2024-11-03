@@ -44,7 +44,7 @@ export default function CollegeRegistrationDetails() {
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto my-8">
+    <Card className="w-full mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl flex flex-row justify-between font-bold">
           Colleges

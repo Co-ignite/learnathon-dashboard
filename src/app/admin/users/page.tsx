@@ -38,6 +38,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { db } from "@/lib/firebase";
+import { updateDoc, doc, deleteDoc } from "firebase/firestore";
+import { useToast, toast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -50,6 +53,7 @@ export default function Component() {
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  // const toast = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,37 +65,65 @@ export default function Component() {
     },
   });
 
-  const getUsers = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const response = await fetch("/api/users", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok || response.status === 200) {
-        const data = await response.json();
-        setUsers(data.users);
-      }
-    } catch (error) {
-      console.error("Failed to fetch trainers:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
   useEffect(() => {
+    const getUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/users", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok || response.status === 200) {
+          const data = await response.json();
+          setUsers(data.users);
+        }
+      } catch (error) {
+        console.error("Failed to fetch trainers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     getUsers();
   }, []);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (editingUser) {
-      setUsers(
-        users.map((t) => (t.id === editingUser.id ? { ...data, id: t.id } : t))
-      );
-      setEditingUser(null);
+      try {
+        // check if email changed
+        if (editingUser.email !== data.email) {
+          toast({
+            title: "Update failed",
+            description: "Email cannot be changed",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const userRef = doc(db, "users", editingUser.id!);
+        await updateDoc(userRef, data);
+
+        setUsers(
+          users.map((t) => (t.id === editingUser.id ? { ...data, id: t.id } : t))
+        );
+
+        toast({
+          title: "Success",
+          description: "User updated successfully",
+          variant: "default",
+        });
+
+        setEditingUser(null);
+      } catch (error) {
+        toast({
+          title: "Update failed",
+          description: "Failed to update user",
+          variant: "destructive",
+        });
+      }
+
     } else {
       const addUser = async () => {
         const response = await fetch("/api/users", {
@@ -104,7 +136,17 @@ export default function Component() {
         if (response.ok || response.status === 200) {
           const data = await response.json();
           setUsers([...users, { ...data, id: Date.now().toString() }]);
+          toast({
+            title: "Success",
+            description: "User added successfully",
+            variant: "default",
+          });
         } else {
+          toast({
+            title: "Failed",
+            description: "Failed to add user",
+            variant: "destructive",
+          });
           console.error("Failed to add trainer:", response.statusText);
         }
       };
@@ -118,8 +160,28 @@ export default function Component() {
     form.reset(trainer);
   };
 
-  const deleteUser = (id: string) => {
-    setUsers(users.filter((user) => user.id !== id));
+  const deleteUser = async (id: string) => {
+
+    // take conset from user
+    const confirm = window.confirm("Are you sure you want to delete this user?");
+    if (!confirm) return;
+
+    const userRef = doc(db, "users", id)
+    try{
+      await deleteDoc(userRef)
+      setUsers(users.filter((user) => user.id !== id));
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+        variant: "default",
+      });
+    }catch(e){
+      toast({
+        title: "Error",
+        description: "Failed to delete user",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -153,7 +215,7 @@ export default function Component() {
                       <FormLabel>Role</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={"Trainer"}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -236,7 +298,9 @@ export default function Component() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && <TableRow>Loading...</TableRow>}
+              {loading && <div
+                className="w-max items-center text-center"
+              >Loading...</div>}
               {users.map((trainer) => (
                 <TableRow key={trainer.id}>
                   <TableCell>{trainer.name}</TableCell>
@@ -252,6 +316,8 @@ export default function Component() {
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      {
+                        trainer.role !== "college" &&
                       <Button
                         variant="outline"
                         size="icon"
@@ -259,6 +325,7 @@ export default function Component() {
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                      }
                     </div>
                   </TableCell>
                 </TableRow>

@@ -1,11 +1,11 @@
 export interface Participant {
   id: string;
-  name: string;
-  email: string;
-  contact: string;
-  branch: string;
-  degree: string;
-  percentage: number;
-  year: number;
+  Name: string;
+  Email: string;
+  Contact: string;
+  Branch: string;
+  Degree: string;
+  Percentage: number;
+  Year: number;
   collegeId: string;
 }

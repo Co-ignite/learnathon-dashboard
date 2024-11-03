@@ -1,7 +1,8 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:3394283034.
 "use client"
 
 import { LogOut } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase";
 
@@ -25,6 +26,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar(props: SidebarProps) {
+  const router = useRouter();
   return (
     <>
       <motion.section
@@ -39,27 +41,21 @@ export default function Sidebar(props: SidebarProps) {
       >
         <div className="py-4">
           {props.tiles.map((tile) => (
-            <Link href={tile.path} key={tile.path}>
-              <motion.div
-                onClick={() => {
-                  props.setPath(tile.path);
-                  if (tile.open) {
-                    tile.open = !tile.open;
-                  } else {
-                    tile.open = true;
-                  }
-                  props.setTiles([...props.tiles]);
-                }}
-                className={`mx-4 mb-4 px-4 py-2 flex flex-row gap-2 rounded ${
-                  props.path === tile.path
-                    ? "bg-white text-black font-bold"
-                    : "hover:bg-white hover:text-black"
+            <motion.div
+              key={tile.path}
+              onClick={() => {
+                router.push(tile.path);
+                props.setPath(tile.path);
+                props.setTiles([...props.tiles]);
+              }}
+              className={`cursor-pointer mx-4 mb-4 px-4 py-2 flex flex-row gap-2 rounded cursor-pointer ${props.path === tile.path
+                ? "bg-white text-black font-bold"
+                : "hover:bg-white hover:text-black"
                 }`}
-              >
-                {tile.icon}
-                {props.isSidebarOpen ? tile.name : ""}
-              </motion.div>
-            </Link>
+            >
+              {tile.icon}
+              {props.isSidebarOpen ? tile.name : ""}
+            </motion.div>
           ))}
         </div>
         <div

@@ -40,38 +40,52 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { CollegeRegistration } from "@/app/models/registration";
-import { User } from "@/app/models/user";
+import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
+
+import type { ModuleConfirmation } from "@/app/models/moduleConfirmation";
+import type { CollegeRegistration } from "@/app/models/registration";
+import type { User } from "@/app/models/user";
 
 const formSchema = z.object({
-  collegeName: z.string().min(2, "College name must be at least 2 characters"),
-  spoc: z.string().min(2, "spoc name is required"),
-  status: z.string(),
-  batchesCount: z.string(),
-  financials: z.number(),
+  college: z.object({
+    id: z.string(),
+    collegeName: z.string(),
+  }).nullable(),
+  spoc: z.string().min(2, "SPOC name is required"),
+  status: z.enum(["pending", "active", "completed"]),
+  batchesCount: z.string().min(1, "Number of batches is required"),
+  financials: z.number().min(0, "Financials must be a positive number"),
   startDate: z.date(),
   endDate: z.date(),
   isMouSigned: z.boolean(),
   notes: z.string().optional(),
-  trainers: z.array(z.string()),
+  trainers: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+  })),
 });
 
-type ModuleConfirmationFormProps = {
-  initialData?: z.infer<typeof formSchema>;
-  onSubmit: (data: z.infer<typeof formSchema>) => void;
+type ModuleFormProps = {
+  initialData?: ModuleConfirmation;
+  onSubmit?: (data: ModuleConfirmation) => Promise<void>;
   isEdit?: boolean;
 };
 
-export default function Component(
-  { initialData, onSubmit, isEdit = false }: ModuleConfirmationFormProps = {
-    onSubmit: (data) => console.log(data),
-    isEdit: false,
-  }
-) {
+export default function ModuleForm({ 
+  initialData, 
+  onSubmit: propOnSubmit,
+  isEdit = false 
+}: ModuleFormProps) {
+  const [colleges, setColleges] = useState<CollegeRegistration[]>([]);
+  const [trainers, setTrainers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      collegeName: "",
+      college: null,
       spoc: "",
       status: "pending",
       batchesCount: "",
@@ -83,88 +97,116 @@ export default function Component(
       trainers: [],
     },
   });
-  const [colleges, setColleges] = useState<CollegeRegistration[]>([]);
-  const [trainers, setTrainers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (initialData) {
-      form.reset(initialData);
-    }
-  }, [initialData]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [collegesRes, trainersRes] = await Promise.all([
+          axios.get("/api/colleges"),
+          axios.get("/api/users/trainers")
+        ]);
 
-  useEffect(() => {
-    if (!initialData) {
-      setLoading(true);
+        if (collegesRes.data.success) {
+          setColleges(collegesRes.data.registrations);
+        }
+        if (trainersRes.data.success) {
+          setTrainers(trainersRes.data.users);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load required data",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      const fetchRegistrations = async () => {
-        try {
-          const response = await axios.get("/api/colleges");
-          if (response.data.success) {
-            setColleges(response.data.registrations);
-          }
-        } catch (error) {
-          console.error("Failed to fetch college registrations:", error);
-        } finally {
-          setLoading(false);
+    fetchData();
+  }, []);
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      if (propOnSubmit) {
+        await propOnSubmit(data as ModuleConfirmation);
+      } else {
+        const response = await axios.post("/api/modules/module", data);
+        if (response.data.success) {
+          toast({
+            title: "Success",
+            description: `Module ${isEdit ? "updated" : "created"} successfully`,
+          });
+          router.push('/admin/modules');
         }
-      };
-      const fetchTrainers = async () => {
-        try {
-          const response = await axios.get("/api/users/trainers");
-          if (response.data.success) {
-            setTrainers(response.data.users);
-          }
-        } catch (error) {
-          console.error("Failed to fetch trainers:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchTrainers();
-      fetchRegistrations();
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast({
+        title: "Error",
+        description: `Failed to ${isEdit ? "update" : "create"} module`,
+        variant: "destructive",
+      });
     }
-  }, [initialData]);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto my-10">
+    <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle>{isEdit ? "Edit Module" : "Add Module"}</CardTitle>
       </CardHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="collegeName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>College Name</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="college"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>College</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      if (value === "add") {
+                        router.push("/admin/colleges/add");
+                        return;
+                      }
+                      const selectedCollege = colleges.find(c => c.id === value);
+                      field.onChange(selectedCollege || null);
+                    }}
+                    value={field.value?.id || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select college" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent
+                      className="bg-white"
                     >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select college name" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {colleges.map((college) => (
-                          <SelectItem
-                            key={college.id}
-                            value={college.collegeName}
-                          >
-                            {college.collegeName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <SelectItem value="add">
+                        <span className="text-muted-foreground">Add College</span>
+                      </SelectItem>
+                      {colleges.map((college) => (
+                        <SelectItem key={college.id} value={college.id!}>
+                          {college.collegeName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
               <FormField
                 control={form.control}
@@ -333,45 +375,60 @@ export default function Component(
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="trainers"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Trainers</FormLabel>
-                    <Controller
-                      name="trainers"
-                      control={form.control}
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={(value) => {
-                            const updatedValue = field.value.includes(value)
-                              ? field.value.filter((v) => v !== value)
-                              : [...field.value, value];
-                            field.onChange(updatedValue);
+            <FormField
+              control={form.control}
+              name="trainers"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Trainers</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      const trainer = trainers.find(t => t.id === value);
+                      if (trainer && !field.value.find(t => t.id === trainer.id)) {
+                        field.onChange([...field.value, trainer]);
+                      }
+                    }}
+                    value=""
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select trainers" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent
+                      className="bg-white"
+                    >
+                      {trainers.map((trainer) => (
+                        <SelectItem key={trainer.id} value={trainer.id!}>
+                          {trainer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="mt-2">
+                    {field.value.map((trainer) => (
+                      <div
+                        key={trainer.id}
+                        className="flex items-center justify-between p-2 bg-secondary rounded-md mt-1"
+                      >
+                        <span>{trainer.name}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            field.onChange(field.value.filter(t => t.id !== trainer.id));
                           }}
-                          value={""}
                         >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select trainers" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {trainers.map((trainer) => (
-                              <SelectItem key={trainer.id} value={trainer.name}>
-                                {trainer.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                          ✕
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -392,10 +449,16 @@ export default function Component(
             />
           </CardContent>
           <CardFooter className="flex justify-end space-x-2">
-            <Button variant="outline" type="button">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+            >
               Cancel
             </Button>
-            <Button type="submit">{isEdit ? "Update" : "Submit"}</Button>
+            <Button type="submit">
+              {isEdit ? "Update" : "Submit"}
+            </Button>
           </CardFooter>
         </form>
       </Form>

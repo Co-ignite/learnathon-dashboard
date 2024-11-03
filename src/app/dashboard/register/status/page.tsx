@@ -1,22 +1,16 @@
 "use client";
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:2500774303.
+export const dynamic = "force-dynamic";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import PaymentStatus from "@/components/college/paymentStatus";
-import { useSearchParams } from "next/navigation";
 
 export default function Status() {
-  const searchParams = useSearchParams();
-  const [orderId, setOrderId] = useState<string | null>(null);
-
-  useEffect(() => {
-    setOrderId(searchParams.get("order_id"));
-    console.log("searchParams", searchParams.get("order_id"));
-  }, [searchParams]);
-
   return (
-    <PaymentStatus
-      returnURL={`/dashboard/register/success`}
-      orderId={orderId!}
-    />
+    <Suspense fallback={<div>Loading...</div>} >
+      <PaymentStatus
+        returnURL={`/dashboard/register/success`}
+        />
+    </Suspense>
   );
 }

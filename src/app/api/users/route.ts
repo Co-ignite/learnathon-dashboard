@@ -47,18 +47,18 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, role, mail, contact } = body;
+    const { name, role, email, contact } = body;
 
     await createUserWithEmailAndPassword(
       auth,
-      mail,
-      Math.random().toString(36).substring(7)
+      email,
+      "password1234" // Replace with a secure password generation method
     ).then((userCredential) => {
       // add user to the database
       const newUser = {
         name,
         role,
-        mail,
+        email,
         contact,
       };
 
@@ -66,10 +66,10 @@ export async function POST(req: NextRequest) {
 
       setDoc(userCollectionRef, newUser);
 
-      sendPasswordResetEmail(auth, mail);
+      sendPasswordResetEmail(auth, email);
     });
 
-    NextResponse.json(
+    return NextResponse.json(
       {
         success: true,
         message: "User added successfully",

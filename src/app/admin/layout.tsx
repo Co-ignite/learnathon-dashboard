@@ -1,7 +1,7 @@
 "use client"
 
 import Sidebar from "@/components/admin/sidebar"
-import { useState, useEffect, useDebugValue } from "react";
+import { useState, useEffect, useDebugValue, Suspense } from "react";
 import {
   UserCircleIcon,
   LogOut,
@@ -107,7 +107,7 @@ export default function AdminLayout({
           <div className="fixed top-0 right-0 bg-white rounded-lg p-4 shadow-lg min-h-content min-w-content m-12">
             <div
               className="bg-black text-white text-center py-2 px-10 mt-4 cursor-pointer flex flex-row gap-2"
-              onClick={() => {}}
+              onClick={() => { }}
             >
               <Settings size={20} />
               Setting
@@ -172,9 +172,11 @@ export default function AdminLayout({
                 initial={{ width: "85%" }}
                 animate={{ width: isSidebarOpen ? "85%" : "96%" }}
                 transition={{ duration: 0.5 }}
-                className=" h-full overflow-y-auto overflow-x-hidden relative"
+                className=" h-full overflow-y-auto overflow-x-hidden relative p-10"
               >
-                {children}
+                <Suspense fallback={<div>Loading...</div>}>
+                  {children}
+                </Suspense>
                 <Toaster />
               </motion.div>
               <motion.button

@@ -1,8 +1,9 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback } from "react"
+import { FilterIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -10,118 +11,145 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from "@/components/ui/table"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useDebounce } from "@/hooks/use-debounce";
-import { Participant } from "@/app/models/participant";
-import { CollegeRegistration } from "@/app/models/registration";
-export default function Component() {
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [lastDoc, setLastDoc] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
+} from "@/components/ui/select"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { useDebounce } from "@/hooks/use-debounce"
+import { CollegeRegistration } from "@/app/models/registration"
+import { Participant } from "@/app/models/participant"
+
+type SortConfig = {
+  field: keyof Participant
+  direction: 'asc' | 'desc'
+}
+
+export default function ParticipantsList() {
+  const [participants, setParticipants] = useState<Participant[]>([])
+  const [colleges, setColleges] = useState<CollegeRegistration[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState({
-    registrationId: "",
-    participantName: "",
-  });
-  const [registrations, setRegistrations] = useState<CollegeRegistration[]>([]);
+    collegeId: "",
+    participantName: ""
+  })
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    field: 'Name',
+    direction: 'asc'
+  })
+  const [lastDoc, setLastDoc] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(true)
 
-  const debouncedFilters = useDebounce(filters, 500);
+  const debouncedFilters = useDebounce(filters, 500)
 
   useEffect(() => {
-    fetchRegistrations();
-  }, []);
+    fetchColleges()
+  }, [])
 
-  useEffect(() => {
-    fetchParticipants(true);
-  }, [debouncedFilters]);
-
-  const fetchRegistrations = async () => {
+  const fetchParticipants = useCallback(async (reset: boolean = false) => {
+    setLoading(true)
+    setError(null)
     try {
-      const response = await fetch("/api/colleges");
-      const data = await response.json();
-      if (response.ok) {
-        setRegistrations(data.registrations);
-      } else {
-        console.error("Failed to fetch registrations:", data.error);
-      }
-    } catch (error) {
-      console.error("Error fetching registrations:", error);
-    }
-  };
-
-  const fetchParticipants = async (reset = false) => {
-    try {
-      setLoading(true);
       const params = new URLSearchParams({
-        pageSize: "10",
-        ...(debouncedFilters.registrationId && {
-          registrationId: debouncedFilters.registrationId,
-        }),
-        ...(debouncedFilters.participantName && {
-          participantName: debouncedFilters.participantName,
-        }),
-        ...(lastDoc && !reset && { lastDoc }),
-      });
+        ...(debouncedFilters.collegeId && { collegeId: debouncedFilters.collegeId.toString() }),
+        ...(debouncedFilters.participantName && { participantName: debouncedFilters.participantName.toString() }),
+        sortField: sortConfig.field.toString(),
+        sortDirection: sortConfig.direction.toString(),
+        pageSize: '20', // Increased page size for better performance
+        ...(lastDoc && !reset && { lastDoc: lastDoc.toString() }) // Ensure lastDoc is a string
+      })
 
-      const response = await fetch(`/api/participants?${params}`);
-      const data = await response.json();
+      const response = await fetch(`/api/participants?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch participants')
+      const data = await response.json()
 
-      if (response.ok) {
-        setParticipants(
-          reset ? data.participants : [...participants, ...data.participants]
-        );
-        setLastDoc(data.lastDoc);
-        setHasMore(data.hasMore);
-      } else {
-        console.error("Failed to fetch participants:", data.error);
-      }
+      setParticipants(prev => reset ? data.participants : [...prev, ...data.participants])
+      setLastDoc(data.lastDoc)
+      setHasMore(data.hasMore)
     } catch (error) {
-      console.error("Error fetching participants:", error);
+      setError('Error fetching participants. Please try again.')
+      console.error('Error fetching participants:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+    }, [debouncedFilters, sortConfig, lastDoc]
+  )
+
+  useEffect(() => {
+    fetchParticipants(true)
+  }, [])
+
+  const fetchColleges = async () => {
+    try {
+      const response = await fetch('/api/colleges')
+      if (!response.ok) throw new Error('Failed to fetch colleges')
+      const data = await response.json()
+      setColleges(data.registrations)
+    } catch (error) {
+      console.error('Error fetching colleges:', error)
+      setError('Failed to fetch colleges')
+    }
+  }
+
 
   const handleFilterChange = (key: keyof typeof filters) => (value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
+    setFilters(prev => ({ ...prev, [key]: value }))
+    setLastDoc(null)
+  }
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+  const handleSort = (field: keyof Participant) => {
+    setSortConfig(current => ({
+      field,
+      direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc'
+    }))
+    setLastDoc(null)
+  }
+
+  const getSortIcon = (field: keyof Participant) => {
+    if (sortConfig.field === field) {
+      return sortConfig.direction === 'asc' ? (
+        <ChevronUpIcon className="ml-2 h-4 w-4" />
+      ) : (
+        <ChevronDownIcon className="ml-2 h-4 w-4" />
+      )
+    }
+    return <FilterIcon className="ml-2 h-4 w-4 opacity-0 group-hover:opacity-100" />
+  }
+
+  const getCollegeName = (collegeId: string) => {
+    return colleges.find(c => c.id === collegeId)?.collegeName || 'Unknown College'
+  }
 
   return (
-    <Card className="w-full m-auto">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Participants List</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <Select
-            value={filters.registrationId}
-            onValueChange={(value) =>
-              handleFilterChange("registrationId")(value)
-            }
+            value={filters.collegeId}
+            onValueChange={(value) => handleFilterChange("collegeId")(value)}
           >
-            <SelectTrigger className="w-[400px]">
+            <SelectTrigger className="w-full sm:w-[300px]">
               <SelectValue placeholder="Select College" />
             </SelectTrigger>
-            <SelectContent>
-              {registrations.map((registration) => (
-                <SelectItem key={registration.id} value={registration.id ?? ""}>
-                  {registration.collegeName}
+            <SelectContent
+              className="bg-white"
+            >
+              {colleges.map((college) => (
+                <SelectItem key={college.id} value={college.id!}>
+                  {college.collegeName}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -129,88 +157,75 @@ export default function Component() {
           <Input
             placeholder="Search by participant name"
             value={filters.participantName}
-            onChange={(e) =>
-              handleFilterChange("participantName")(e.target.value)
-            }
-            className="max-w-xs"
+            onChange={(e) => handleFilterChange("participantName")(e.target.value)}
+            className="w-full sm:w-[300px]"
           />
         </div>
 
-        {filters.registrationId &&
-          registrations.find((r) => r.id === filters.registrationId) && (
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  {registrations
-                    .filter(
-                      (registration) =>
-                        registration.id === filters.registrationId
-                    )
-                    .map((registration) => (
-                      <div key={registration.id} className="space-y-4">
-                        <div>
-                          <div className="font-medium">
-                            Representative Details
-                          </div>
-                          <div>Name: {registration.repName}</div>
-                          <div>Email: {registration.repEmail}</div>
-                          <div>Contact: {registration.repContact}</div>
-                          <div>Role: {registration.role}</div>
-                        </div>
-                        <div>
-                          <div className="font-medium">
-                            Registration Details
-                          </div>
-                          <div>
-                            Payment Status: {registration.paymentStatus}
-                          </div>
-                          <div>
-                            Participants:{" "}
-                            {registration.uploadLater ? "Later" : "Uploaded"}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+        {error && <div className="text-red-500 mb-4">{error}</div>}
 
-        <div className="border rounded-md">
+        <div className="border rounded-md overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead>Degree</TableHead>
-                <TableHead>Year</TableHead>
-                <TableHead>Percentage</TableHead>
+                <TableHead
+                  className="group cursor-pointer"
+                  onClick={() => handleSort('Name')}
+                >
+                  Name {getSortIcon('Name')}
+                </TableHead>
+                <TableHead>College</TableHead>
+                <TableHead
+                  className="group cursor-pointer"
+                  onClick={() => handleSort('Branch')}
+                >
+                  Branch {getSortIcon('Branch')}
+                </TableHead>
+                <TableHead
+                  className="group cursor-pointer"
+                  onClick={() => handleSort('Degree')}
+                >
+                  Degree {getSortIcon('Degree')}
+                </TableHead>
+                <TableHead
+                  className="group cursor-pointer"
+                  onClick={() => handleSort('Year')}
+                >
+                  Year {getSortIcon('Year')}
+                </TableHead>
+                <TableHead
+                  className="group cursor-pointer"
+                  onClick={() => handleSort('Percentage')}
+                >
+                  Percentage {getSortIcon('Percentage')}
+                </TableHead>
                 <TableHead>Contact</TableHead>
+                <TableHead>Email</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {participants.map((participant) => (
-                <TableRow key={`${participant.collegeId}-${participant.id}`}>
-                  <TableCell>{participant.name}</TableCell>
-                  <TableCell>{participant.email}</TableCell>
-                  <TableCell>{participant.branch}</TableCell>
-                  <TableCell>{participant.degree}</TableCell>
-                  <TableCell>{participant.year}</TableCell>
-                  <TableCell>{participant.percentage}%</TableCell>
-                  <TableCell>{participant.contact}</TableCell>
+                <TableRow key={participant.id}>
+                  <TableCell>{participant.Name}</TableCell>
+                  <TableCell>{getCollegeName(participant.collegeId)}</TableCell>
+                  <TableCell>{participant.Branch}</TableCell>
+                  <TableCell>{participant.Degree}</TableCell>
+                  <TableCell>{participant.Year}</TableCell>
+                  <TableCell>{participant.Percentage}%</TableCell>
+                  <TableCell>{participant.Contact}</TableCell>
+                  <TableCell>{participant.Email}</TableCell>
                 </TableRow>
               ))}
               {loading && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">
+                  <TableCell colSpan={8} className="text-center">
                     Loading...
                   </TableCell>
                 </TableRow>
               )}
               {!loading && participants.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">
+                  <TableCell colSpan={8} className="text-center">
                     No participants found
                   </TableCell>
                 </TableRow>
@@ -223,7 +238,7 @@ export default function Component() {
           <div className="mt-4 flex justify-center">
             <Button
               variant="outline"
-              onClick={() => fetchParticipants()}
+              onClick={() => fetchParticipants(false)}
               disabled={loading}
             >
               Load More
@@ -232,5 +247,5 @@ export default function Component() {
         )}
       </CardContent>
     </Card>
-  );
+  )
 }

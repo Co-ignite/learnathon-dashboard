@@ -177,15 +177,15 @@ export default function CollegeDetailsForm(props: {
       const responseData = await response.json();
 
       console.log("response data is " + JSON.stringify(responseData));
-      if (!response.ok || !responseData.success) {
+      if (!responseData.success) {
         toast({
           title: "Error",
           description:
-            responseData.data.message ||
+            responseData.message ||
             "Failed to update college details. Please try again.",
           variant: "destructive",
         });
-        throw new Error("Failed to update college details");
+        return;
       }
 
       props.onComplete({

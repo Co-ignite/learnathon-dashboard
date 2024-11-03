@@ -1,4 +1,7 @@
-import { db } from "@/lib/firebase";
+export const dynamic = "force-dynamic";
+
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/firebase'
 import {
   collection,
   getDocs,
@@ -7,110 +10,78 @@ import {
   orderBy,
   limit,
   startAfter,
-  QueryDocumentSnapshot,
   DocumentData,
-  collectionGroup,
-  getDoc,
-  doc,
-} from "firebase/firestore";
-import { Participant } from "@/app/models/participant";
+  QueryDocumentSnapshot,
+  Query
+} from 'firebase/firestore'
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const pageSize = parseInt(searchParams.get("pageSize") || "10");
-    const lastDoc = searchParams.get("lastDoc");
-    const collegeId = searchParams.get("collegeId");
-    const participantName = searchParams.get("participantName");
+    const { searchParams } = new URL(request.url)
+    console.log(searchParams)
+    const collegeId = searchParams.get('collegeId')
+    const participantName = searchParams.get('participantName')
+    const sortField = searchParams.get('sortField') || 'Name'
+    const sortDirection = searchParams.get('sortDirection') || 'asc'
+    const pageSize = parseInt(searchParams.get('pageSize') || '10', 10)
+    const lastDoc = searchParams.get('lastDoc')
 
-    let participantsQuery;
+    if (isNaN(pageSize) || pageSize <= 0) {
+      return NextResponse.json({ error: 'Invalid page size' }, { status: 400 })
+    }
+
+    const constraints: any[] = [orderBy(sortField, sortDirection as 'asc' | 'desc')]
 
     if (collegeId) {
-      // Query specific college's participants
-      participantsQuery = query(
-        collection(db, "registration", collegeId, "participants"),
-        orderBy("name")
-      );
-    } else {
-      // Query all participants across all colleges
-      participantsQuery = query(collectionGroup(db, "registrations"));
+      constraints.unshift(where('collegeId', '==', collegeId))
     }
 
-    // Apply name filter if provided
     if (participantName) {
-      participantsQuery = query(
-        participantsQuery,
-        where("name", ">=", participantName),
-        where("name", "<=", participantName + "\uf8ff")
-      );
+      constraints.push(
+        where('Name', '>=', participantName),
+        where('Name', '<=', participantName + '\uf8ff')
+      )
     }
 
-    // Apply pagination
     if (lastDoc) {
-      const lastDocSnapshot = await getDocumentSnapshot(lastDoc, collegeId);
+      const lastDocSnapshot = await getDocumentSnapshot(lastDoc)
       if (lastDocSnapshot) {
-        participantsQuery = query(
-          participantsQuery,
-          startAfter(lastDocSnapshot)
-        );
+        constraints.push(startAfter(lastDocSnapshot))
       }
     }
 
-    participantsQuery = query(participantsQuery, limit(pageSize));
+    constraints.push(limit(pageSize))
 
-    const snapshot = await getDocs(participantsQuery);
-    const participants: Participant[] = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      participants.push({
-        id: doc.id,
-        ...data,
-        collegeId: doc.ref.parent.parent?.id || "",
-      } as Participant);
-    });
+    const participantsRef = collection(db, 'participants')
+    const q = query(participantsRef, ...constraints) as Query<DocumentData>
+    const snapshot = await getDocs(q)
 
-    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+    const participants = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
 
-    return Response.json({
+    const lastVisible = snapshot.docs[snapshot.docs.length - 1]
+
+    return NextResponse.json({
       participants,
-      lastDoc: lastVisible
-        ? JSON.stringify({
-            id: lastVisible.id,
-            collegeId: lastVisible.ref.parent.parent?.id,
-          })
-        : null,
-      hasMore: snapshot.docs.length === pageSize,
-    });
+      lastDoc: lastVisible ? lastVisible.id : null,
+      hasMore: snapshot.docs.length === pageSize
+    })
   } catch (error) {
-    console.error("Error fetching participants:", error);
-    return Response.json(
-      { error: "Failed to fetch participants" },
-      { status: 500 }
-    );
+    console.error('Error fetching participants:', error)
+    return NextResponse.json({ error: 'Failed to fetch participants' }, { status: 500 })
   }
 }
 
-async function getDocumentSnapshot(
-  lastDocString: string,
-  collegeId: string | null
-): Promise<QueryDocumentSnapshot<DocumentData> | null> {
+async function getDocumentSnapshot(docId: string): Promise<QueryDocumentSnapshot<DocumentData> | null> {
   try {
-    const lastDoc = JSON.parse(lastDocString);
-    let docRef;
-    if (collegeId) {
-      docRef = doc(db, "registrations", collegeId, "participants", lastDoc.id);
-    } else {
-      // For collection group queries, we need to use a different approach
-      const q = query(
-        collectionGroup(db, "participants"),
-        where("__name__", "==", lastDoc.id)
-      );
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs[0] || null;
-    }
-    const docSnap = await getDoc(docRef);
-    return docSnap as QueryDocumentSnapshot<DocumentData>;
-  } catch {
-    return null;
+    const participantsRef = collection(db, 'participants')
+    const q = query(participantsRef, where('__name__', '==', docId))
+    const querySnapshot = await getDocs(q)
+    return querySnapshot.docs[0] || null
+  } catch (error) {
+    console.error('Error getting document snapshot:', error)
+    return null
   }
 }

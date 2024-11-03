@@ -5,15 +5,14 @@ import { useSearchParams } from "next/navigation";
 
 export default function PaymentStatus({
   returnURL = "",
-  orderId = "",
 }: {
   returnURL: string;
-  orderId: string;
 }) {
   const [status, setStatus] = useState<string>("");
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("order_id");
 
   useEffect(() => {
-    console.log("orderId", orderId);
     const verifyPayment = async () => {
       try {
         const response = await fetch(

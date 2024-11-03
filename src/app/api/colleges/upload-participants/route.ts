@@ -110,7 +110,10 @@ export async function POST(req: NextRequest) {
         const participantDocRef = doc(
           collection(db, "registrations", collegeId, "participants")
         );
-        batch.set(participantDocRef, participant);
+        batch.set(participantDocRef, {
+          ...participant,
+          collegeId,
+        });
       });
 
       batches.push(batch.commit());
@@ -119,6 +122,19 @@ export async function POST(req: NextRequest) {
     await Promise.all(batches);
 
     const collegeDocRef = doc(db, "registrations", collegeId);
+
+    // also push to "participants collection"
+    const participantBatch = writeBatch(db);
+    participants.forEach((participant) => {
+      const participantDocRef = doc(
+        collection(db, "participants")
+      );
+      participantBatch.set(participantDocRef, {
+        ...participant,
+        collegeId,
+      });
+    });
+    await participantBatch.commit();
 
     // update uploadLater to false
     await updateDoc(collegeDocRef, {
