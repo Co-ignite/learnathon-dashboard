@@ -10,16 +10,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from "src/components/ui/form";
+import { Input } from "src/components/ui/input";
+import { Button } from "src/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "src/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { CardFooter } from "../ui/card";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import RegistrationProcess from "@/components/college/registrationForm";
-import { CardFooter } from "@/components/ui/card";
+import RegistrationProcess from "src/components/college/registrationForm";
+import { CardFooter } from "src/components/ui/card";
 
 export default function Register() {
   const [loading, setLoading] = useState(true);

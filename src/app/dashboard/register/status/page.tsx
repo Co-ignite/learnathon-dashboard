@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { Suspense } from "react";
-import PaymentStatus from "@/components/college/paymentStatus";
+import PaymentStatus from "src/components/college/paymentStatus";
 
 export default function Status() {
   return (

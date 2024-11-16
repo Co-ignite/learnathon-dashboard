@@ -13,8 +13,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
+} from "src/components/ui/form";
+import { Button } from "src/components/ui/button";
 import { useDropzone } from "react-dropzone";
 import { Upload, File, FileDownIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";

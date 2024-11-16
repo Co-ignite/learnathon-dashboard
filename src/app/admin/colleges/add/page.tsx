@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import RegistrationProcess from "@/components/college/registrationForm";
+import RegistrationProcess from "src/components/college/registrationForm";
 
 export default function AddCollege() {
   const [loading, setLoading] = useState(true);

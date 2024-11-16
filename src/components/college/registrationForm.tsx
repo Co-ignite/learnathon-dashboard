@@ -3,11 +3,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CollegeDetailsForm from "@/components/college/collegeForm";
-import FileUploadForm from "@/components/college/fileUploadForm";
-import PaymentForm from "@/components/college/paymentForm";
-import { RegistrationSteps } from "@/components/college/registrationSteps";
+import { Card, CardContent, CardHeader, CardTitle } from "src/components/ui/card";
+import CollegeDetailsForm from "src/components/college/collegeForm";
+import FileUploadForm from "src/components/college/fileUploadForm";
+import PaymentForm from "src/components/college/paymentForm";
+import { RegistrationSteps } from "src/components/college/registrationSteps";
 import RegistrationCompleted from "./registrationCompleted";
 
 export default function RegistrationProcess({

@@ -11,9 +11,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from "src/components/ui/form";
+import { Input } from "src/components/ui/input";
+import { Button } from "src/components/ui/button";
 import { useState } from "react";
 import { load } from "@cashfreepayments/cashfree-js";
 import { useToast } from "@/hooks/use-toast";

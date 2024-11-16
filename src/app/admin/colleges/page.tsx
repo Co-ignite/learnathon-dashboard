@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "src/components/ui/card";
 import {
   Table,
   TableBody,
@@ -10,10 +10,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "src/components/ui/table";
 import { Loader2 } from "lucide-react";
 import { CollegeRegistration } from "@/app/models/registration";
-import { Button } from "@/components/ui/button";
+import { Button } from "src/components/ui/button";
 
 export default function CollegeRegistrationDetails() {
   const [registrations, setRegistrations] = useState<CollegeRegistration[]>([]);

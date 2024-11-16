@@ -4,15 +4,15 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "src/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "src/components/ui/card";
+import { Input } from "src/components/ui/input";
 import {
   Form,
   FormControl,
@@ -20,7 +20,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "src/components/ui/form";
 import {
   Table,
   TableBody,
@@ -28,7 +28,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "src/components/ui/table";
 import { Pencil, Trash2 } from "lucide-react";
 import { User } from "@/app/models/user";
 import {
@@ -37,7 +37,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "src/components/ui/select";
 import { db } from "@/lib/firebase";
 import { updateDoc, doc, deleteDoc } from "firebase/firestore";
 import { useToast, toast } from "@/hooks/use-toast";

@@ -1,6 +1,6 @@
 "use client"
 
-import Sidebar from "@/components/admin/sidebar"
+import Sidebar from "src/components/admin/sidebar"
 import { useState, useEffect, useDebugValue, Suspense } from "react";
 import {
   UserCircleIcon,
@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { motion } from "framer-motion";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "src/components/ui/toaster";
 import { useRouter } from "next/navigation";
 
 interface User {

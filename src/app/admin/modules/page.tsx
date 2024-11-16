@@ -1,5 +1,5 @@
 // app/admin/modules/page.tsx
-import ModulesList from '@/components/college/modulesList';
+import ModulesList from 'src/components/college/modulesList';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { ModuleConfirmation } from "@/app/models/moduleConfirmation";

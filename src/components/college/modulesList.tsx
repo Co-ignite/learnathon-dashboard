@@ -8,15 +8,15 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "src/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from "src/components/ui/select";
+import { Button } from "src/components/ui/button";
 import {
   Table,
   TableBody,
@@ -24,19 +24,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "src/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "src/components/ui/dropdown-menu";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import type { ModuleConfirmation } from '@/app/models/moduleConfirmation';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Badge } from 'src/components/ui/badge';
+import { Input } from 'src/components/ui/input';
 
 interface ModulesListProps {
   initialModules?: ModuleConfirmation[];

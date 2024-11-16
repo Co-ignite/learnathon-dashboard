@@ -1,6 +1,6 @@
 "use client";
 
-import ModuleConfirmationForm from "@/components/college/moduleConfirmationForm"
+import ModuleConfirmationForm from "src/components/college/moduleConfirmationForm"
 
 export default function Form() {
   return (
