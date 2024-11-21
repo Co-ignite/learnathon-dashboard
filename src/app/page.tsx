@@ -5,10 +5,12 @@ import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { useEffect } from "react";
+import { usePathname } from 'next/navigation'
 
 export default function Home() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const getUserData = async () => {
@@ -33,7 +35,9 @@ export default function Home() {
           router.push("/login");
         }
       } else {
-        router.push("/login");
+        if (pathname !== '/dashboard/register')
+          router.push('/login')
+
       }
     };
 
