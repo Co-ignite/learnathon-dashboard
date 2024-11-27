@@ -22,7 +22,8 @@ import {
 } from "src/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
-import { CardFooter } from "../ui/card";
+import { CardFooter } from "src/components/ui/card";
+import { Checkbox } from "src/components/ui/checkbox";
 
 const formSchema = z.object({
   state: z.string().min(1, "Please select a state"),
@@ -34,6 +35,7 @@ const formSchema = z.object({
   repEmail: z.string().email("Invalid email address"),
   repContact: z.string().min(10, "Contact number must be at least 10 digits"),
   role: z.string().min(2, "Role must be at least 2 characters"),
+  agreeToTerms: z.boolean().refine((value) => value, { message: 'You must agree to the terms and conditions' }),
 });
 
 type FormValues = z.infer<typeof formSchema> & { id?: string };
@@ -101,6 +103,7 @@ export default function CollegeDetailsForm(props: {
       repEmail: "",
       repContact: "",
       role: "",
+      agreeToTerms: false,
     },
   });
 
@@ -367,6 +370,24 @@ export default function CollegeDetailsForm(props: {
             </Select>
             <FormMessage />
           </FormItem>
+          <div className="flex items-center space-x-2">
+            <FormField
+              control={form.control}
+              name="agreeToTerms"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <label
+              htmlFor="agreeToTerms"
+              className="text-sm text-gray-500"
+            >I agree to the <a href="/terms-and-conditions" className="text-blue-500 hover:underline">terms and conditions</a></label>
+          </div>
           <Button type="submit" className="w-full">
             Next
           </Button>
