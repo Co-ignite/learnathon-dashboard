@@ -326,6 +326,7 @@ export default function CollegeDetailsForm(props: {
           {["repName", "repEmail", "repContact"].map((name) => (
             <FormField
               control={form.control}
+              key={name} 
               name={name as keyof FormValues}
               render={({ field: { value, ...field } }) => (
                 <FormItem>
