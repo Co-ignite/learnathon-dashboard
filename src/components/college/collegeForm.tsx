@@ -11,7 +11,7 @@ import {
   FormLabel,
   FormMessage,
 } from "src/components/ui/form";
-import { Input } from "src/components/ui/input";
+import { Input } from "../ui/input";
 import { Button } from "src/components/ui/button";
 import {
   Select,
@@ -325,10 +325,9 @@ export default function CollegeDetailsForm(props: {
 
           {["repName", "repEmail", "repContact"].map((name) => (
             <FormField
-              key={name}
               control={form.control}
               name={name as keyof FormValues}
-              render={({ field }) => (
+              render={({ field: { value, ...field } }) => (
                 <FormItem>
                   <FormLabel>
                     {name
@@ -336,7 +335,11 @@ export default function CollegeDetailsForm(props: {
                       .replace(/^./, (str) => str.toUpperCase())}
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder={`Enter ${name}`} {...field} />
+                    <Input
+                      placeholder={`Enter ${name}`}
+                      value={value as string}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -374,10 +377,14 @@ export default function CollegeDetailsForm(props: {
             <FormField
               control={form.control}
               name="agreeToTerms"
-              render={({ field }) => (
+              render={({ field: { value, ...field } }) => (
                 <FormItem>
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    <Checkbox
+                      checked={!!value}
+                      onCheckedChange={(checked) => field.onChange(checked)}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
