@@ -177,7 +177,7 @@ export default function LearnathonTerms() {
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Contact Information</h2>
                 <div className="bg-gray-100 p-4 rounded-lg">
                     <h3 className="text-xl font-medium mb-2">Data Protection Officer</h3>
-                    <p>Email: <a href="mailto:privacy@learnathon.live" className="text-blue-600 hover:underline">privacy@learnathon.live</a></p>
+                    <p>Email: <a href="mailto:privacy@learnathon.live" className="text-blue-600 hover:underline">hr@learnathon.live</a></p>
                     <p>Phone: +91 98493 85819</p>
                 </div>
             </section>
