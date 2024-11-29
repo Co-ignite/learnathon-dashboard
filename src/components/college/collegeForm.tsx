@@ -326,7 +326,7 @@ export default function CollegeDetailsForm(props: {
           {["repName", "repEmail", "repContact"].map((name) => (
             <FormField
               control={form.control}
-              key={name} 
+              key={name}
               name={name as keyof FormValues}
               render={({ field: { value, ...field } }) => (
                 <FormItem>
@@ -394,7 +394,7 @@ export default function CollegeDetailsForm(props: {
             <label
               htmlFor="agreeToTerms"
               className="text-sm text-gray-500"
-            >I agree to the <a href="/terms-and-conditions" className="text-blue-500 hover:underline">terms and conditions</a></label>
+            >I agree to the <a href="/terms-and-conditions-privacy-policy" className="text-blue-500 hover:underline">terms and conditions, privacy policy</a></label>
           </div>
           <Button type="submit" className="w-full">
             Next
