@@ -58,15 +58,21 @@ export default function LearnathonTerms() {
                 </section>
 
                 <section className="mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">3. Student Participation Criteria</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">3. Terms of Use</h2>
                     <div className="bg-green-50 p-4 rounded-lg">
                         <ul className="list-disc list-inside space-y-2">
-                            <li>Students must:
+                            <li>By accessing or using the Learnathon website, users agree to abide by these terms and any applicable laws.</li>
+                            <li>Users are prohibited from:
                                 <ul className="list-circle pl-6">
-                                    <li>Be currently enrolled in the institution</li>
-                                    <li>Age range: 18-30 years</li>
-                                    <li>Have basic interest in technology</li>
-                                    <li>Possess fundamental computer skills</li>
+                                    <li>Posting harmful, abusive, or illegal content.</li>
+                                    <li>Engaging in fraudulent activities or impersonation.</li>
+                                    <li>Violating intellectual property rights or confidentiality obligations.</li>
+                                </ul>
+                            </li>
+                            <li>Learnathon reserves the right to:
+                                <ul className="list-circle pl-6">
+                                    <li>Restrict access to users violating the terms of use.</li>
+                                    <li>Modify or discontinue website features at any time without notice.</li>
                                 </ul>
                             </li>
                         </ul>
@@ -74,8 +80,25 @@ export default function LearnathonTerms() {
                 </section>
 
                 <section className="mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Cancellation and Refund Policy</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Limitations of Liability</h2>
                     <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                        <p className="mb-4">
+                            Learnathon and its organizers are not liable for any direct, indirect, incidental, or consequential damages arising from:
+                        </p>
+                        <ul className="list-disc list-inside space-y-2">
+                            <li>Technical issues, delays, or failures during website usage or event participation.</li>
+                            <li>Errors in information, content, or materials provided on the website.</li>
+                            <li>Loss of data, revenue, or profits associated with the event or website.</li>
+                        </ul>
+                        <p className="mt-4">
+                            The website and event services are provided "as-is" without any warranties, express or implied.
+                        </p>
+                    </div>
+                </section>
+
+                <section className="mb-6">
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Cancellation and Refund Policy</h2>
+                    <div className="bg-gray-50 p-4 rounded-lg">
                         <h3 className="text-xl font-medium text-red-700 mb-2">NO REFUND POLICY</h3>
                         <p className="mb-2">Absolutely no refunds will be issued for:</p>
                         <ul className="list-disc list-inside">
@@ -86,7 +109,7 @@ export default function LearnathonTerms() {
                 </section>
 
                 <section className="mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">Contact Information</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">6. Contact Information</h2>
                     <div className="bg-gray-100 p-4 rounded-lg">
                         <h3 className="text-xl font-medium mb-2">Learnathon Team</h3>
                         <p>Email: <a href="mailto:hr@learnathon.live" className="text-blue-600 hover:underline">hr@learnathon.live</a></p>
@@ -94,18 +117,9 @@ export default function LearnathonTerms() {
                     </div>
                 </section>
 
-                <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500 mb-6">
-                    <h3 className="text-xl font-medium mb-2">Important Notes</h3>
-                    <ul className="list-disc list-inside space-y-2">
-                        <li>By proceeding with registration, all institutional representatives acknowledge the terms and conditions</li>
-                        <li>Pricing is subject to negotiation for bulk registrations</li>
-                        <li>All fees are exclusive of GST</li>
-                    </ul>
-                </div>
-
                 <footer className="text-center text-gray-500 pt-6 border-t">
                     <p>© 2024 Learnathon. All rights reserved.</p>
-                    <p>Version 1.2 - Last Updated: November 26th, 2024</p>
+                    <p>Version 1.3 - Last Updated: November 26th, 2024</p>
                 </footer>
             </div>
         </main>
