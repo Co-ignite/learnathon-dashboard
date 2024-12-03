@@ -91,7 +91,7 @@ export default function LearnathonTerms() {
                             <li>Loss of data, revenue, or profits associated with the event or website.</li>
                         </ul>
                         <p className="mt-4">
-                            The website and event services are provided "as-is" without any warranties, express or implied.
+                            The website and event services are provided &quot;as-is&quot; without any warranties, express or implied.
                         </p>
                     </div>
                 </section>
