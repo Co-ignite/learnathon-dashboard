@@ -118,7 +118,7 @@ export default function LearnathonTerms() {
                 </section>
 
                 <footer className="text-center text-gray-500 pt-6 border-t">
-                    <p>© 2024 Learnathon (Co-ignite Ed-Tech Services Pvt Ltd). All rights reserved.</p>
+                    <p>© 2024 Learnathon 4.0 (Co-ignite Ed-Tech Services Pvt Ltd). All rights reserved.</p>
                     <p>Version 1.3 - Last Updated: Dec 3rd, 2024</p>
                 </footer>
             </div>
@@ -197,7 +197,7 @@ export default function LearnathonTerms() {
             </section>
 
             <footer className="text-center text-gray-500 pt-6 border-t">
-                <p>© 2024 Learnathon (Co-ignite Ed-Tech Services Pvt Ltd). All rights reserved.</p>
+                <p>© 2024 Learnathon 4.0 (Co-ignite Ed-Tech Services Pvt Ltd). All rights reserved.</p>
                 <p>Version 1.0 - Effective Date: November 29th, 2024</p>
             </footer>
         </main>
